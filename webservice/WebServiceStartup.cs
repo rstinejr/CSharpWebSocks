@@ -11,6 +11,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
+using System.Net.WebSockets;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -59,9 +60,21 @@ namespace waltonstine.demo.csharp.webservice
 
             app
                 .UseDeveloperExceptionPage()   //.UseExceptionHandler("/error");
-                .UseRouter(BuildRoutes(app));
+                .UseRouter(BuildRoutes(app))
+                .UseWebSockets()
+                .Use(async (context, next) => 
+                {
+                    if (context.WebSockets.IsWebSocketRequest) 
+                    {
+                        var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+                        await Upload(context, webSocket, loggerFactory.CreateLogger("Upload"));
+                    } 
+                    else 
+                    {
+                        await next();
+                    }
+                });
         }
-
 
         #endregion
 
@@ -73,13 +86,40 @@ namespace waltonstine.demo.csharp.webservice
 
 
         /*
+         * Upload: handler server side of WebSocket.
+         * All WebSocket requests routed here.
+         */
+        private async Task Upload(HttpContext httpCtx, WebSocket sock, ILogger logger) {
+            // N.B., if we need to define different sorts of upload, we could differentiate by the request path.
+            // Regardless of path, WebSocket requests are directed here.
+            logger.LogInformation($"Upload method called: WebSocket request, request path is {httpCtx.Request.Path}");
+
+            int totalBytes = 0;
+            byte[] buffer = new byte[10240];
+            MemoryStream ms = new MemoryStream();
+           
+            for (; ; ) 
+            {
+                WebSocketReceiveResult result = await sock.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                logger.LogDebug($"Received {result.Count} bytes from client.");
+                ms.Write(buffer, 0, result.Count);
+                totalBytes += result.Count;
+                if (result.EndOfMessage || result.CloseStatus != null)
+                {
+                    break;
+                }
+            }
+
+            return;
+        }
+
+        /*
          * Handle "GET /hello"
          */
         private Task GotHello(HttpContext httpCtx)
         {
             return httpCtx.Response.WriteAsync("Hello, World!");
         }
-
 
         /*
          * Dummy request handler to use until real guts can be put together.
