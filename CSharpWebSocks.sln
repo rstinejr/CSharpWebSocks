@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "webservice", "webservice\webservice.csproj", "{1D6D035D-31F6-4C21-AB80-DE689D7B94E0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "webclientCli", "webclientCli\webclientCli.csproj", "{E830D11C-D733-449E-9313-37FD316C983E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{1D6D035D-31F6-4C21-AB80-DE689D7B94E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D6D035D-31F6-4C21-AB80-DE689D7B94E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D6D035D-31F6-4C21-AB80-DE689D7B94E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E830D11C-D733-449E-9313-37FD316C983E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E830D11C-D733-449E-9313-37FD316C983E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E830D11C-D733-449E-9313-37FD316C983E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E830D11C-D733-449E-9313-37FD316C983E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
