@@ -19,6 +19,7 @@ techniques and info:
 * Workable directory layout for unit test and projects
 * Read the body of a POST with StreamReader.
 * Convert a file URL to its local OS file path using new Uri(fileURL).LocalPath.
+* Use of BSON for serialization.
 
 # Development Environment
 
