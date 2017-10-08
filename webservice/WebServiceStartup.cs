@@ -139,8 +139,10 @@ namespace waltonstine.demo.csharp.webservice
         private Task StartUpload(HttpContext httpCtx)
         {
             StreamReader rdr = new StreamReader(httpCtx.Request.Body);
-            string fileURL = rdr.ReadToEnd();
-            log.LogInformation($"StartUpload: file url is {fileURL}");
+            string fileUrlStr = rdr.ReadToEnd();
+            Uri fileURI = new Uri(fileUrlStr);
+
+            log.LogInformation($"StartUpload: file url is '{fileUrlStr}', absolute path is {fileURI.LocalPath}");
 
             int returnedID;
 
