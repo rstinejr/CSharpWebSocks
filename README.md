@@ -17,9 +17,8 @@ The API for the upload server is:
 In addition to demonstrating the use of Web Sockets, this project shows some handy 
 techniques and info: 
 
-* Workable directory layout for unit test and projects
 * Post an HTTP request from a console app, and get the response.
-* Read the body of a POST with StreamReader.
+* On the server side, read the body of a POST with StreamReader.
 
 # Build
 
