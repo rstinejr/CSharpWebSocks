@@ -36,7 +36,7 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
                 return;
             }
 
-            string url = args[0];
+            string url  = args[0];
             string path = args[1];
 
             Console.WriteLine($"Send request to {url}");
