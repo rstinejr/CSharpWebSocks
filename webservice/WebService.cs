@@ -31,7 +31,6 @@ namespace waltonstine.demo.csharp.webservice
             IWebHost host =
                 new WebHostBuilder()
                  //.ConfigureServices(services => { services.AddSingleton<IEvidenceUploadManager, EvidenceUploadManager>(); })
-                //.ConfigureServices(services => { services.AddSingleton<ISearchIdFactory,       SearchIdFactory>();   })
                  .UseKestrel()
                  .UseContentRoot(Directory.GetCurrentDirectory())
                  .UseUrls("http://*:54321")
