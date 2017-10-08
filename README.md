@@ -46,7 +46,7 @@ In another console windows;
 1. ```pushd webclientCli```
 2. ```dotnet run localhost data.xml```
 
-This will upload test file data.xml to file webservice\upload.1.
+This will upload test file data.xml to file webservice\upload.1, assuming this is the first upload handled by the server process. Note that the files' contents are identical.
 
 # Development Environment
 

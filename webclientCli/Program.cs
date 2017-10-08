@@ -66,11 +66,13 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
             Console.WriteLine($"{data.Length} bytes uploaded to {controllerUri}");
         }
 
+        static string SRVR_PORT = "54321";
+
         static void Main(string[] args)
         {
             if (args.Length != 2)
             {
-                Console.Error.WriteLine("Usage: dotnet run <ip:port> <src file path>");
+                Console.Error.WriteLine("Usage: dotnet run <server IP or host> <src file path>");
                 return;
             }
 
@@ -85,12 +87,12 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
 
             Console.WriteLine($"Send request to {srvr} for upload ID.");
 
-            Task<string> replyContent = RetrieveUploadID($"http://{srvr}/upload", path);
+            Task<string> replyContent = RetrieveUploadID($"http://{srvr}:{SRVR_PORT}/upload", path);
             if (replyContent != null)
             {
                 replyContent.Wait();
                 Console.WriteLine($"Upload ID is {replyContent.Result}");
-                string uploadURL = $"ws://{srvr}/upload/{replyContent.Result}";
+                string uploadURL = $"ws://{srvr}:{SRVR_PORT}/upload/{replyContent.Result}";
 
                 /* TODO: it would be more robust to read and send the content in reasonable segments. That way, even
                  * really large files could be uplaoded.
