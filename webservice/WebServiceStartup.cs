@@ -52,13 +52,13 @@ namespace waltonstine.demo.csharp.webservice
          */
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory) {
 
-            //loggerFactory.AddConsole();
+            loggerFactory.AddConsole();
 
             log = loggerFactory
                     .CreateLogger("CSharpWebSock");
 
             app
-                //.UseDeveloperExceptionPage()   //.UseExceptionHandler("/error");
+                .UseDeveloperExceptionPage()   //.UseExceptionHandler("/error");
                 .UseRouter(BuildRoutes(app));
         }
 
@@ -77,7 +77,6 @@ namespace waltonstine.demo.csharp.webservice
          */
         private Task GotHello(HttpContext httpCtx)
         {
-
             return httpCtx.Response.WriteAsync("Hello, World!");
         }
 
@@ -112,7 +111,7 @@ namespace waltonstine.demo.csharp.webservice
 
             RouteBuilder routeBuilder = new RouteBuilder(app, new RouteHandler(null));
 
-
+            routeBuilder.MapGet("",      GotHello);
             routeBuilder.MapGet("hello", GotHello);
 
             return routeBuilder.Build();
