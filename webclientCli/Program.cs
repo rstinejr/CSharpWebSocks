@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Net.WebSockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace waltonstine.demo.csharp.websockets.webclientcli
@@ -44,17 +46,35 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
             }
 
             return await resp.Content.ReadAsStringAsync();
-         }
+        }
+
+        /*
+         * SendBytes: Use WebSockets to send data to Controller.
+         *            Executed from a worker task, so it's OK for this to be synchronous.
+         */
+        private static void SendBytes(Uri controllerUri, byte[] data)
+        {
+            Console.WriteLine($"Send {data.Length} bytes to {controllerUri}");
+            ClientWebSocket sock = new ClientWebSocket();
+            Task sockTask = sock.ConnectAsync(controllerUri, CancellationToken.None);
+            if (!sockTask.Wait(5000))
+            {
+                throw new Exception($"Timeout attempting to connect to {controllerUri}");
+            }
+
+            sock.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None).Wait();
+            Console.WriteLine($"{data.Length} bytes uploaded to {controllerUri}");
+        }
 
         static void Main(string[] args)
         {
             if (args.Length != 2)
             {
-                Console.Error.WriteLine("Usage: dotnet run <server URL> <src file path>");
+                Console.Error.WriteLine("Usage: dotnet run <ip:port> <src file path>");
                 return;
             }
 
-            string url  = args[0];
+            string srvr = args[0];
             string path = args[1];
 
             if ( ! File.Exists(path))
@@ -63,13 +83,23 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
                 return;
             }
 
-            Console.WriteLine($"Send request to {url} for upload ID.");
+            Console.WriteLine($"Send request to {srvr} for upload ID.");
 
-            Task<string> replyContent = RetrieveUploadID(url, path);
+            Task<string> replyContent = RetrieveUploadID($"http://{srvr}/upload", path);
             if (replyContent != null)
             {
                 replyContent.Wait();
                 Console.WriteLine($"Upload ID is {replyContent.Result}");
+                string uploadURL = $"ws://{srvr}/upload/{replyContent.Result}";
+
+                /* TODO: it would be more robust to read and send the content in reasonable segments. That way, even
+                 * really large files could be uplaoded.
+                 */
+                byte[] fileBytes = File.ReadAllBytes(path);
+
+                Console.WriteLine($"upload file bytes to {uploadURL}");
+
+                SendBytes(new Uri(uploadURL), fileBytes);
             }
 
             return;
