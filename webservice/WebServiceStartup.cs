@@ -84,7 +84,7 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
                     if (context.WebSockets.IsWebSocketRequest) 
                     {
                         var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                        await Upload(context, webSocket, loggerFactory.CreateLogger("Upload"));
+                        await Upload(context, webSocket);
                     } 
                     else 
                     {
@@ -101,33 +101,41 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
         /// Methods that respond to HTTP Requests
         ////////////////////////////////////////////////////////////////////////////////////
 
+        private string ExtractUploadID(PathString requestPath)
+        {
+            string wrkPath = requestPath.ToString();
+            int lastInx = wrkPath.LastIndexOf('/');
+            return wrkPath.Substring(lastInx + 1);
+        }
 
         /*
          * Upload: handler server side of WebSocket.
          * All WebSocket requests routed here.
          */
-        private async Task Upload(HttpContext httpCtx, WebSocket sock, ILogger logger)
+        private async Task Upload(HttpContext httpCtx, WebSocket sock)
         {
-            // N.B., if we need to define different sorts of upload, we could differentiate by the request path.
-            // Regardless of path, WebSocket requests are directed here.
-            logger.LogInformation($"Upload method called: WebSocket request, request path is {httpCtx.Request.Path}");
+            log.LogInformation($"Upload method called: WebSocket request, request path is {httpCtx.Request.Path}");
 
-            int totalBytes   = 0;
-            byte[] buffer   = new byte[10240];
-            MemoryStream ms = new MemoryStream();
-           
-            for ( ; ; ) 
-            {
-                WebSocketReceiveResult result = await sock.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                logger.LogDebug($"Received {result.Count} bytes from client.");
-                ms.Write(buffer, 0, result.Count);
-                totalBytes += result.Count;
-                if (result.EndOfMessage || result.CloseStatus != null)
+            string id = ExtractUploadID(httpCtx.Request.Path);
+            log.LogInformation($"Upload: ID {id} extracted from path.");
+            int totalBytes = 0;
+            byte[] buffer = new byte[10240];
+
+            using (FileStream fs = new FileStream($"upload.{id}", FileMode.Create))
+            { 
+                for (; ; )
                 {
-                    break;
+                    WebSocketReceiveResult result =
+                        await sock.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                    log.LogDebug($"Received {result.Count} bytes from client.");
+                    fs.Write(buffer, 0, result.Count);
+                    totalBytes += result.Count;
+                    if (result.EndOfMessage || result.CloseStatus != null)
+                    {
+                        break;
+                    }
                 }
             }
-
             return;
         }
 
