@@ -72,7 +72,7 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
             log = loggerFactory
                     .CreateLogger("CSharpWebSock");
 
-            uploadID = 1;
+            nextUploadID = 1;
             idLock   = new object();
 
             app
@@ -143,15 +143,16 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
         private Task StartUpload(HttpContext httpCtx)
         {
             StreamReader rdr = new StreamReader(httpCtx.Request.Body);
-            string fileUrlStr = rdr.ReadToEnd();
-
+            string uploadName = rdr.ReadToEnd();
 
             int returnedID;
 
             lock(idLock) 
             {
-                returnedID = this.uploadID++;    
+                returnedID = this.nextUploadID++;    
             }
+
+            log.LogInformation($"StartUpload: name '{uploadName}', id {returnedID}");
 
             return httpCtx.Response.WriteAsync($"{returnedID}");
         }
@@ -183,9 +184,10 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
         #endregion
 
 
-        private ILogger log;
-        private int     uploadID;
-        private object  idLock;
+        private ILogger                 log;
+        private Dictionary<int, string> uploads;
+        private int                     nextUploadID;
+        private object                  idLock;
 
         #region Routing
 
