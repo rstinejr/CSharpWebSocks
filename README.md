@@ -8,8 +8,9 @@ This project illustrates the use of Web Sockets in .NET Core. Note that Web Sock
 The API for the upload server is:
 
 * GET / : display info about the provided service and supported URIs.    
-* POST /upload : Request initiation of an upload. The client posts the length of the file it will upload; the server responds with an upload ID.
-* <Web Socket> : Use BSON to serialize upload. A file is uploaded in fixed chunks; the last chunk will probably be truncated but all others will be the constant chunk size. Output is serialized using BSON. The uploaded packet includes the upload ID, the chunk numnber, and a byte array of file content.
+* POST /upload : Request initiation of an upload. The client posts the name of the upload; the server responds with an upload ID.
+* <Web Socket> : Send a byte stream; let TCP take care of segmenting and reassemby.
+
 
 # Bonus
 
@@ -18,8 +19,6 @@ techniques and info:
 
 * Workable directory layout for unit test and projects
 * Read the body of a POST with StreamReader.
-* Convert a file URL to its local OS file path using new Uri(fileURL).LocalPath.
-* Use of BSON for serialization.
 
 # Development Environment
 

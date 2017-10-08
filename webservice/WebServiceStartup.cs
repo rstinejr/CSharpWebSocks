@@ -16,7 +16,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-using waltonstine.demo.csharp.websockets.upload;
 
 namespace waltonstine.demo.csharp.websockets.uploadservice
 {
@@ -113,11 +112,11 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
             // Regardless of path, WebSocket requests are directed here.
             logger.LogInformation($"Upload method called: WebSocket request, request path is {httpCtx.Request.Path}");
 
-            int totalBytes = 0;
-            byte[] buffer = new byte[UploadChunk.CHUNK_SIZE];
+            int totalBytes   = 0;
+            byte[] buffer   = new byte[10240];
             MemoryStream ms = new MemoryStream();
            
-            for (; ; ) 
+            for ( ; ; ) 
             {
                 WebSocketReceiveResult result = await sock.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 logger.LogDebug($"Received {result.Count} bytes from client.");
