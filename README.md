@@ -21,6 +21,33 @@ techniques and info:
 * Post an HTTP request from a console app, and get the response.
 * Read the body of a POST with StreamReader.
 
+# Build
+
+1. ```git clone git@github.com:rstinejr/CSharpWebSocks.git```
+2. ```cd CSharpWebSocks```
+3. ```pushd webservice```
+4. ```dotnet restore```
+5. ```dotnet build```
+6. ```popd```
+7. ```pushd webclientCli```
+8. ```dotnet restore```
+9. ```dotnet build```
+10. ```popd```
+
+# Run
+
+Start the server. In one console window,
+
+1. ```pushd webservice```
+2. ```dotnet run```
+
+In another console windows;
+
+1. ```pushd webclientCli```
+2. ```dotnet run localhost data.xml```
+
+This will upload test file data.xml to file webservice\upload.1.
+
 # Development Environment
 
 Develooped on 64-bit Windows 10, using ```netcorapp2.0```.
