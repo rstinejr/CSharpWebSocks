@@ -8,7 +8,7 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
 {
     class Program
     {
-        public static async Task<HttpResponseMessage> PostString(string serverURL, string dataString)
+        private static async Task<HttpResponseMessage> PostString(string serverURL, string dataString)
         {
             StringContent strContent = new StringContent(dataString);
 
@@ -28,6 +28,24 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
             return response;
         }
 
+        private static async Task<string> RetrieveUploadID(string url, string path)
+        {
+            Task<HttpResponseMessage> task = PostString(url, Path.GetFileName(path));
+
+            task.Wait();
+
+            HttpResponseMessage resp = task.Result;
+
+            Console.WriteLine($"Got respons, status {resp.StatusCode}");
+            if (!resp.IsSuccessStatusCode)
+            {
+                Console.Error.WriteLine($"Request error: {resp.ToString()}");
+                return null;
+            }
+
+            return await resp.Content.ReadAsStringAsync();
+         }
+
         static void Main(string[] args)
         {
             if (args.Length != 2)
@@ -39,21 +57,22 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
             string url  = args[0];
             string path = args[1];
 
-            Console.WriteLine($"Send request to {url}");
-            Task<HttpResponseMessage> task = PostString(url, path);
-
-            task.Wait();
-
-            HttpResponseMessage resp = task.Result;
-
-            Console.WriteLine($"Got respons, status {resp.StatusCode}");
-            if (resp.IsSuccessStatusCode)
+            if ( ! File.Exists(path))
             {
-                Task<string> contentTask = resp.Content.ReadAsStringAsync();
-                contentTask.Wait();
-
-                Console.WriteLine($"Return from query content '{contentTask.Result}'");
+                Console.Error.WriteLine($"File '{path}' not found.");
+                return;
             }
+
+            Console.WriteLine($"Send request to {url} for upload ID.");
+
+            Task<string> replyContent = RetrieveUploadID(url, path);
+            if (replyContent != null)
+            {
+                replyContent.Wait();
+                Console.WriteLine($"Upload ID is {replyContent.Result}");
+            }
+
+            return;
         }
     }
 }
