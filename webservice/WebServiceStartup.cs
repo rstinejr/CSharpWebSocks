@@ -28,6 +28,17 @@ namespace waltonstine.demo.csharp.webservice
      */
     class WebServiceStartup
     {
+        private static string ServiceDescription =
+            "Demo of WebSockets. URLs:\n"
+          + "    GET  /       show this message\n"
+          + "    GET  /hello  display 'Hello, World!\n"
+          + "    POST /upload initiate an upload. The upload ID to use with the WebSocket message.\n"
+          + "\n"
+          + "All web socket messages are presumed to be for an active upload.\n"
+          + "Web socket upload messages are BSON messages in the following format:\n"
+          + "    {upload_id:<id>,\n"
+          + "     chunk_number:<seqno>,\n"
+          + "     data:binary};\n";
 
         #region .NET Callbacks
 
@@ -113,6 +124,12 @@ namespace waltonstine.demo.csharp.webservice
             return;
         }
 
+        private Task ShowServiceDescription(HttpContext httpCtx) 
+        {
+            return httpCtx.Response.WriteAsync(ServiceDescription);
+        }
+
+
         /*
          * Handle "GET /hello"
          */
@@ -151,7 +168,7 @@ namespace waltonstine.demo.csharp.webservice
 
             RouteBuilder routeBuilder = new RouteBuilder(app, new RouteHandler(null));
 
-            routeBuilder.MapGet("",      GotHello);
+            routeBuilder.MapGet("",      ShowServiceDescription);
             routeBuilder.MapGet("hello", GotHello);
 
             return routeBuilder.Build();
