@@ -198,7 +198,7 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
 
 
         private ILogger                 log;
-        private Dictionary<int, string> uploads;
+        //private Dictionary<int, string> uploads;
         private int                     nextUploadID;
         private object                  idLock;
 
