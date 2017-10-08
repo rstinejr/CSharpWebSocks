@@ -122,8 +122,10 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
             byte[] buffer = new byte[10240];
 
             using (FileStream fs = new FileStream($"upload.{id}", FileMode.Create))
-            { 
-                for (; ; )
+            {
+                log.LogInformation($"Writing to {fs.Name}");
+
+                for ( ; ; )
                 {
                     WebSocketReceiveResult result =
                         await sock.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
@@ -135,7 +137,10 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
                         break;
                     }
                 }
+                fs.Flush();
+                fs.Close();
             }
+
             return;
         }
 
