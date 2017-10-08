@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace waltonstine.demo.csharp.webservice
+namespace waltonstine.demo.csharp.websockets.uploadservice
 {
   
     public class WebService

@@ -16,7 +16,9 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace waltonstine.demo.csharp.webservice
+using waltonstine.demo.csharp.websockets.upload;
+
+namespace waltonstine.demo.csharp.websockets.uploadservice
 {
     /*
      * Startup claass used by .NET Core Web Service. Defines the "Routes", which is ASP-speak for the local part
@@ -30,9 +32,11 @@ namespace waltonstine.demo.csharp.webservice
     {
         private static string ServiceDescription =
             "Demo of WebSockets. URLs:\n"
-          + "    GET  /       show this message\n"
-          + "    GET  /hello  display 'Hello, World!\n"
-          + "    POST /upload initiate an upload. The upload ID to use with the WebSocket message.\n"
+          + "    GET  /       Show this message\n"
+          + "    GET  /hello  Display 'Hello, World!\n"
+          + "    POST /upload Initiate an upload.\n" 
+          + "                 The client posts the length of the file it will upload.\n"
+          + "                 On success, the server returns the upload ID to use with the WebSocket messages.\n"
           + "\n"
           + "All web socket messages are presumed to be for an active upload.\n"
           + "Web socket upload messages are BSON messages in the following format:\n"
@@ -103,13 +107,14 @@ namespace waltonstine.demo.csharp.webservice
          * Upload: handler server side of WebSocket.
          * All WebSocket requests routed here.
          */
-        private async Task Upload(HttpContext httpCtx, WebSocket sock, ILogger logger) {
+        private async Task Upload(HttpContext httpCtx, WebSocket sock, ILogger logger)
+        {
             // N.B., if we need to define different sorts of upload, we could differentiate by the request path.
             // Regardless of path, WebSocket requests are directed here.
             logger.LogInformation($"Upload method called: WebSocket request, request path is {httpCtx.Request.Path}");
 
             int totalBytes = 0;
-            byte[] buffer = new byte[10240];
+            byte[] buffer = new byte[UploadChunk.CHUNK_SIZE];
             MemoryStream ms = new MemoryStream();
            
             for (; ; ) 
@@ -140,9 +145,7 @@ namespace waltonstine.demo.csharp.webservice
         {
             StreamReader rdr = new StreamReader(httpCtx.Request.Body);
             string fileUrlStr = rdr.ReadToEnd();
-            Uri fileURI = new Uri(fileUrlStr);
 
-            log.LogInformation($"StartUpload: file url is '{fileUrlStr}', absolute path is {fileURI.LocalPath}");
 
             int returnedID;
 
