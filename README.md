@@ -9,7 +9,7 @@ The API for the upload server is:
 
 * GET / : display info about the provided service and supported URIs.    
 * POST /upload : Request initiation of an upload. The client posts the name of the upload; the server responds with an upload ID.
-* <Web Socket> : Send a byte stream; let TCP take care of segmenting and reassemby.
+* <Web Socket> /upload/<upload ID> : Send a byte stream; let TCP take care of segmenting and reassemby. The target upload is identified by the uploadId in the URL.
 
 
 # Bonus
@@ -18,6 +18,7 @@ In addition to demonstrating the use of Web Sockets, this project shows some han
 techniques and info: 
 
 * Workable directory layout for unit test and projects
+* Post an HTTP request from a console app, and get the response.
 * Read the body of a POST with StreamReader.
 
 # Development Environment
