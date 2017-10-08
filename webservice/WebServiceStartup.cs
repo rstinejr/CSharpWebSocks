@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace waltonstine.demo.csharp.webservice
 {
-    /**
+    /*
      * Startup claass used by .NET Core Web Service. Defines the "Routes", which is ASP-speak for the local part
      * of URI paths.
      * 
@@ -68,6 +68,9 @@ namespace waltonstine.demo.csharp.webservice
 
             log = loggerFactory
                     .CreateLogger("CSharpWebSock");
+
+            uploadID = 1;
+            idLock   = new object();
 
             app
                 .UseDeveloperExceptionPage()   //.UseExceptionHandler("/error");
@@ -124,11 +127,30 @@ namespace waltonstine.demo.csharp.webservice
             return;
         }
 
+
         private Task ShowServiceDescription(HttpContext httpCtx) 
         {
             return httpCtx.Response.WriteAsync(ServiceDescription);
         }
 
+        /*
+         * Initiate an upload. Return an upload ID.
+         */
+        private Task StartUpload(HttpContext httpCtx)
+        {
+            StreamReader rdr = new StreamReader(httpCtx.Request.Body);
+            string fileURL = rdr.ReadToEnd();
+            log.LogInformation($"StartUpload: file url is {fileURL}");
+
+            int returnedID;
+
+            lock(idLock) 
+            {
+                returnedID = this.uploadID++;    
+            }
+
+            return httpCtx.Response.WriteAsync($"{returnedID}");
+        }
 
         /*
          * Handle "GET /hello"
@@ -142,8 +164,10 @@ namespace waltonstine.demo.csharp.webservice
          * Dummy request handler to use until real guts can be put together.
          * It echos the request, to indicate that the HTTP part of the server is hooked up.
          */
-        private Task EchoRequest(HttpContext httpCtx) {
-            if (httpCtx.Request.Method == "POST") {
+        private Task EchoRequest(HttpContext httpCtx)
+        {
+            if (httpCtx.Request.Method == "POST")
+            {
                 StreamReader rdr = new StreamReader(httpCtx.Request.Body);
                 string body = rdr.ReadToEnd();
                 log.LogDebug($"Body of POST: {body}");
@@ -155,8 +179,9 @@ namespace waltonstine.demo.csharp.webservice
         #endregion
 
 
-        private ILogger            log;
-
+        private ILogger log;
+        private int     uploadID;
+        private object  idLock;
 
         #region Routing
 
@@ -164,12 +189,13 @@ namespace waltonstine.demo.csharp.webservice
          * Set up URL handling for the Controller API.
          * URLs are listed above, in the initial file header.
          */
-        private IRouter BuildRoutes(IApplicationBuilder app) {
-
+        private IRouter BuildRoutes(IApplicationBuilder app)
+        {
             RouteBuilder routeBuilder = new RouteBuilder(app, new RouteHandler(null));
 
-            routeBuilder.MapGet("",      ShowServiceDescription);
-            routeBuilder.MapGet("hello", GotHello);
+            routeBuilder.MapGet("",        ShowServiceDescription);
+            routeBuilder.MapGet("hello",   GotHello);
+            routeBuilder.MapPost("upload", StartUpload);
 
             return routeBuilder.Build();
         }
