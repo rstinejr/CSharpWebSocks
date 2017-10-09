@@ -32,15 +32,12 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
         private static string ServiceDescription =
             "Demo of WebSockets. URLs:\n"
           + "    GET  /       Show this message\n"
-          + "    POST /upload Initiate an upload.\n" 
+          + "    POST /upload Initiate an upload.\n"
           + "                 The client posts the length of the file it will upload.\n"
           + "                 On success, the server returns the upload ID to use with the WebSocket messages.\n"
           + "\n"
-          + "All web socket messages are presumed to be for an active upload.\n"
-          + "Web socket upload messages are BSON messages in the following format:\n"
-          + "    {upload_id:<id>,\n"
-          + "     chunk_number:<seqno>,\n"
-          + "     data:binary};\n";
+          + "A clients post a file name to /upload and receive an ID.\n"
+          + "The client next opens a web socket to ws://<srvr>:54321/upload/<id>, and copies a files bytes to the socket.";
 
         #region .NET Callbacks
 
