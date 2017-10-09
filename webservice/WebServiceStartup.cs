@@ -32,7 +32,6 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
         private static string ServiceDescription =
             "Demo of WebSockets. URLs:\n"
           + "    GET  /       Show this message\n"
-          + "    GET  /hello  Display 'Hello, World!\n"
           + "    POST /upload Initiate an upload.\n" 
           + "                 The client posts the length of the file it will upload.\n"
           + "                 On success, the server returns the upload ID to use with the WebSocket messages.\n"
@@ -170,35 +169,12 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
             return httpCtx.Response.WriteAsync($"{returnedID}");
         }
 
-        /*
-         * Handle "GET /hello"
-         */
-        private Task GotHello(HttpContext httpCtx)
-        {
-            return httpCtx.Response.WriteAsync("Hello, World!");
-        }
-
-        /*
-         * Dummy request handler to use until real guts can be put together.
-         * It echos the request, to indicate that the HTTP part of the server is hooked up.
-         */
-        private Task EchoRequest(HttpContext httpCtx)
-        {
-            if (httpCtx.Request.Method == "POST")
-            {
-                StreamReader rdr = new StreamReader(httpCtx.Request.Body);
-                string body = rdr.ReadToEnd();
-                log.LogDebug($"Body of POST: {body}");
-            }
-
-            return httpCtx.Response.WriteAsync(httpCtx.Request.Path.ToString());
-        }
 
         #endregion
 
 
         private ILogger                 log;
-        //private Dictionary<int, string> uploads;
+        //private Dictionary<string, string> uploads;
         private int                     nextUploadID;
         private object                  idLock;
 
@@ -213,7 +189,6 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
             RouteBuilder routeBuilder = new RouteBuilder(app, new RouteHandler(null));
 
             routeBuilder.MapGet("",        ShowServiceDescription);
-            routeBuilder.MapGet("hello",   GotHello);
             routeBuilder.MapPost("upload", StartUpload);
 
             return routeBuilder.Build();
