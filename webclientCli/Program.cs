@@ -63,7 +63,9 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
             }
 
             sock.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None).Wait();
-            Console.WriteLine($"{data.Length} bytes uploaded to {controllerUri}");
+            Console.WriteLine($"{data.Length} bytes uploaded to {controllerUri}, now close the connection.");
+            sock.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "upload done.", CancellationToken.None).Wait();
+
         }
 
         static string SRVR_PORT = "54321";
