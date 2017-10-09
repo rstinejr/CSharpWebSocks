@@ -68,8 +68,10 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
             log = loggerFactory
                     .CreateLogger("CSharpWebSock");
 
-            nextUploadID = 1;
-            idLock   = new object();
+            uploads        = new Dictionary<int, string>();
+            nextUploadID   = 1;
+            idLock         = new object();
+            uploadTokenRng = new Random();
 
             app
                 .UseDeveloperExceptionPage()   //.UseExceptionHandler("/error");
@@ -154,16 +156,22 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
             StreamReader rdr = new StreamReader(httpCtx.Request.Body);
             string uploadName = rdr.ReadToEnd();
 
-            int returnedID;
-
+            int uploadNumber;
+            int token;
             lock(idLock) 
             {
-                returnedID = this.nextUploadID++;    
+                token        = uploadTokenRng.Next();
+                uploadNumber = this.nextUploadID++;    
             }
 
-            log.LogInformation($"StartUpload: name '{uploadName}', id {returnedID}");
+            lock(uploads)
+            {
+                uploads[token] = $"{uploadName}.{uploadNumber}";
+            }
 
-            return httpCtx.Response.WriteAsync($"{returnedID}");
+            log.LogInformation($"StartUpload: name '{uploadName}', id {uploadNumber}, token {token}");
+
+            return httpCtx.Response.WriteAsync($"{token}");
         }
 
 
@@ -171,9 +179,10 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
 
 
         private ILogger                 log;
-        //private Dictionary<string, string> uploads;
+        private Dictionary<int, string> uploads;
         private int                     nextUploadID;
         private object                  idLock;
+        private Random                  uploadTokenRng;
 
         #region Routing
 
