@@ -63,12 +63,26 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
             }
 
             sock.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None).Wait();
-            Console.WriteLine($"{data.Length} bytes uploaded to {controllerUri}, now close the connection.");
-            sock.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "upload done.", CancellationToken.None).Wait();
+            /* Ugly hack to get around Web Socket bug on Mint 14.4: spurious error on server side about dropping
+             * web socket connection without performing close protocol.
+             */
+            Thread.Sleep(2000);
 
+
+            Console.WriteLine($"{data.Length} bytes uploaded to {controllerUri}, now close the connection.");
+            try
+            {
+                sock.CloseOutputAsync(WebSocketCloseStatus.NormalClosure,
+                        "upload done.", CancellationToken.None).Wait();
+            }
+            catch (Exception)
+            {
+                // Connection appears to be closed. :)
+
+            }
         }
 
-        static string SRVR_PORT = "54321";
+        static string SRVR_PORT = "54321";  // in real life, this is an unsigned short.
 
         static void Main(string[] args)
         {
