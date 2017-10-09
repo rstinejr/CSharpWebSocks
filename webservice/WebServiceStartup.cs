@@ -99,7 +99,7 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
         /// Methods that respond to HTTP Requests
         ////////////////////////////////////////////////////////////////////////////////////
 
-        private string ExtractUploadID(PathString requestPath)
+        private string ExtractUploadToken(PathString requestPath)
         {
             string wrkPath = requestPath.ToString();
             int lastInx = wrkPath.LastIndexOf('/');
@@ -114,12 +114,26 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
         {
             log.LogInformation($"Upload method called: WebSocket request, request path is {httpCtx.Request.Path}");
 
-            string id = ExtractUploadID(httpCtx.Request.Path);
-            log.LogInformation($"Upload: ID {id} extracted from path.");
+            string tokenStr = ExtractUploadToken(httpCtx.Request.Path);
+            log.LogInformation($"Upload: token {tokenStr} extracted from path.");
+
+            int token = int.Parse(tokenStr);
+            string uploadName;
+            lock (uploads)
+            {
+                if ( ! uploads.ContainsKey(token) )
+                {
+                    log.LogWarning($"Upload: bad token value {tokenStr}");
+                    return;
+                }
+                uploadName = uploads[token];
+                uploads.Remove(token);
+            }
+
             int totalBytes = 0;
             byte[] buffer = new byte[10240];
 
-            using (FileStream fs = new FileStream($"upload.{id}", FileMode.Create))
+            using (FileStream fs = new FileStream(uploadName, FileMode.Create))
             {
                 log.LogInformation($"Writing to {fs.Name}");
 
