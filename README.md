@@ -51,9 +51,9 @@ This will upload test file data.xml to file webservice\upload.1, assuming this i
 
 Develooped on 64-bit Windows 10, using ```netcorapp2.0```.
 
-Built on 64-bit Linux Mint, but in testing ran into this 
+Built on 64-bit Linux Mint 17.2 (based on Ubuntu 14.4), but in testing ran into this 
 error: [WebSocket connection is closed without proper handshake](https://github.com/aspnet/AspNetCoreModule/issues/77).
-Added an ugly hack - a Thread.Sleep() on the client - to handle this.
+Added an ugly hack - a Thread.Sleep() on the client - to handle .NET bug.
  
 
 You can get the .NET Core runtime, SDK, and Visual Studio 2017 IDE from http://dot.net
