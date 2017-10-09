@@ -139,13 +139,21 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
 
                 for ( ; ; )
                 {
-                    WebSocketReceiveResult result =
-                        await sock.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                    log.LogDebug($"Received {result.Count} bytes from client.");
-                    fs.Write(buffer, 0, result.Count);
-                    totalBytes += result.Count;
-                    if (result.EndOfMessage || result.CloseStatus != null)
+                    try
                     {
+                        WebSocketReceiveResult result =
+                            await sock.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                        log.LogDebug($"Received {result.Count} bytes from client.");
+                        fs.Write(buffer, 0, result.Count);
+                        totalBytes += result.Count;
+                        if (result.EndOfMessage || result.CloseStatus != null)
+                        {
+                            break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        log.LogWarning($"Upload error: {ex.Message}");
                         break;
                     }
                 }
