@@ -186,6 +186,8 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
             RouteBuilder routeBuilder = new RouteBuilder(app, new RouteHandler(null));
 
             routeBuilder.MapGet("",        ShowServiceDescription);
+            routeBuilder.MapGet("index",   ShowServiceDescription);
+
             routeBuilder.MapPost("upload", StartUpload);
 
             return routeBuilder.Build();
