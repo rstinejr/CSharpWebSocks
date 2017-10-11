@@ -2,7 +2,6 @@
 using System.IO;
 using System.Net.Http;
 using System.Net.WebSockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,7 +29,7 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
             return response;
         }
 
-        private static async Task<string> RetrieveUploadID(string url, string path)
+        private static async Task<string> RequestUploadToken(string url, string path)
         {
             Task<HttpResponseMessage> task = PostString(url, Path.GetFileName(path));
 
@@ -44,6 +43,7 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
                 Console.Error.WriteLine($"Request error: {resp.ToString()}");
                 return null;
             }
+
 
             return await resp.Content.ReadAsStringAsync();
         }
@@ -77,12 +77,11 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
             }
             catch (Exception)
             {
-                // Connection appears to be closed. :)
-
+                // It seems that the connection is closed. :)
             }
         }
 
-        static string SRVR_PORT = "54321";  // in real life, this is an unsigned short.
+        static string SRVR_PORT = "54321";  // At the network level, this is an unsigned short
 
         static void Main(string[] args)
         {
@@ -103,7 +102,7 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
 
             Console.WriteLine($"Send request to {srvr} for upload ID.");
 
-            Task<string> replyContent = RetrieveUploadID($"http://{srvr}:{SRVR_PORT}/upload", path);
+            Task<string> replyContent = RequestUploadToken($"http://{srvr}:{SRVR_PORT}/upload", path);
             if (replyContent != null)
             {
                 replyContent.Wait();
