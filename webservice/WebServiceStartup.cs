@@ -74,13 +74,15 @@ namespace waltonstine.demo.csharp.websockets.uploadservice
             uploadTokenRng = new Random();
 
             app
-                .UseDeveloperExceptionPage()   //.UseExceptionHandler("/error");
+                .UseDeveloperExceptionPage()
                 .UseRouter(BuildRoutes(app))
                 .UseWebSockets()
                 .Use(async (context, next) => 
                 {
+                    // If server does not know what else to do, try a Web Socket.
                     if (context.WebSockets.IsWebSocketRequest) 
                     {
+                        // Assume that all WebSocket requests are for uploads.
                         var webSocket = await context.WebSockets.AcceptWebSocketAsync();
                         await Upload(context, webSocket);
                     } 
