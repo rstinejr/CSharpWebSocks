@@ -37,7 +37,6 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
 
             HttpResponseMessage resp = task.Result;
 
-            Console.WriteLine($"Got respons, status {resp.StatusCode}");
             if (!resp.IsSuccessStatusCode)
             {
                 Console.Error.WriteLine($"Request error: {resp.ToString()}");
@@ -49,12 +48,10 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
         }
 
         /*
-         * SendBytes: Use WebSockets to send data to Controller.
-         *            Executed from a worker task, so it's OK for this to be synchronous.
+         * SendBytes: Write bytes to a web socket
          */
         private static void SendBytes(Uri controllerUri, byte[] data)
         {
-            Console.WriteLine($"Send {data.Length} bytes to {controllerUri}");
             ClientWebSocket sock = new ClientWebSocket();
             Task sockTask = sock.ConnectAsync(controllerUri, CancellationToken.None);
             if (!sockTask.Wait(5000))
@@ -69,7 +66,7 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
             Thread.Sleep(2000);
 
 
-            Console.WriteLine($"{data.Length} bytes uploaded to {controllerUri}, now close the connection.");
+            Console.WriteLine($"{data.Length} bytes written to {controllerUri}, now close the connection.");
             try
             {
                 sock.CloseOutputAsync(WebSocketCloseStatus.NormalClosure,
@@ -100,21 +97,17 @@ namespace waltonstine.demo.csharp.websockets.webclientcli
                 return;
             }
 
-            Console.WriteLine($"Send request to {srvr} for upload ID.");
-
             Task<string> replyContent = RequestUploadToken($"http://{srvr}:{SRVR_PORT}/upload", path);
             if (replyContent != null)
             {
                 replyContent.Wait();
-                Console.WriteLine($"Upload ID is {replyContent.Result}");
+                Console.WriteLine($"Upload token is {replyContent.Result}");
                 string uploadURL = $"ws://{srvr}:{SRVR_PORT}/upload/{replyContent.Result}";
 
                 /* TODO: it would be more robust to read and send the content in reasonable segments. That way, even
                  * really large files could be uplaoded.
                  */
                 byte[] fileBytes = File.ReadAllBytes(path);
-
-                Console.WriteLine($"upload file bytes to {uploadURL}");
 
                 SendBytes(new Uri(uploadURL), fileBytes);
             }
