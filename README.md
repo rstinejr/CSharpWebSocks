@@ -1,7 +1,9 @@
 # CSharpWebSocks
 Minimal Web Server, CLI clients, that provide simple file upload by using Web Sockets.
 
-This project illustrates the use of Web Sockets in .NET Core. Note that Web Sockets are not natively supported in Windows 7.
+This project illustrates the use of Web Sockets in .NET Core. 
+
+**WARNING!** Because there is no native support for websockets in Windows 7, .NET Core cannot create web sockets on that OS. You get a runtime error if you try.
 
 # API
 
