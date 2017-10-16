@@ -5,6 +5,17 @@ This project illustrates the use of Web Sockets in .NET Core.
 
 **WARNING!** Because there is no native support for websockets in Windows 7, .NET Core cannot create web sockets on that OS. You get a runtime error if you try.
 
+In this project, the client code throws an exception when it tries to open a websocket to the server:
+
+```
+Unhandled Exception: System.PlatformNotSupportedException: The WebSocket protocol is not supported on this platform.
+   at System.Net.WebSockets.WebSocketValidate.ThrowPlatformNotSupportedException()
+   at System.Net.WebSockets.WebSocketHandle.CheckPlatformSupport()
+   at System.Net.WebSockets.ClientWebSocket..ctor()
+   at waltonstine.demo.csharp.websockets.webclientcli.Program.SendBytes(Uri controllerUri, Byte[] data) in C:\CSharpWebSocks\webclientCli\Program.cs:line 55
+   at waltonstine.demo.csharp.websockets.webclientcli.Program.Main(String[] args) in C:\CSharpWebSocks\webclientCli\Program.cs:line 112
+```
+
 # API
 
 The API for the upload server is:
