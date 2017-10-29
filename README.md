@@ -35,7 +35,7 @@ techniques and info:
 
 # Build
 
-1. ```git clone git@github.com:rstinejr/CSharpWebSocks.git```
+1. ```git clone https://github.com/rstinejr/CSharpWebSocks.git```
 2. ```cd CSharpWebSocks```
 3. ```pushd webservice```
 4. ```dotnet restore```
